@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OneMoreStepAPI.Models.Base;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -6,17 +7,16 @@ using System.Threading.Tasks;
 
 namespace OneMoreStepAPI.Models
 {
-    public class User
+    public class User: BaseModel
     {
-        [Key, Required]
-        public int Id { get; set; }
-
         [Required]
         [StringLength(20)]
         public string Username { get; set; }
 
         [Required]
         public string PasswordHash { get; set; }
+
+        public virtual ICollection<Route> Books { get; set; }
 
         //public string PasswordSalt { get; set; }
         //public string EmailAddress { get; set; }
