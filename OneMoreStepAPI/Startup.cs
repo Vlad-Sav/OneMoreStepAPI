@@ -1,3 +1,4 @@
+using Amazon.S3;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -69,7 +70,13 @@ namespace OneMoreStepAPI
                     }
                 });
             });
+            //Adding DB Context
             services.AddDbContext<OneMoreStepAPIDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+            //Adding Amazon S3 Service
+            services.AddAWSService<IAmazonS3>();
+            //Adding Amazon S3 to DI Container
+            var amazonS3Client = new AmazonS3Client(Configuration["AmazonS3:AccessKey"], Configuration["AmazonS3:SecretKey"], Amazon.RegionEndpoint.USEast1);
+            services.AddSingleton(amazonS3Client);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

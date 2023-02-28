@@ -15,5 +15,7 @@ namespace OneMoreStepAPI.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Route> Routes { get; set; }
+        public DbSet<RoutesPicture> RoutesPictures { get; set; }
+        public DbSet<UsersStepsCount> UsersStepsCount { get; set; }
     }
 }

@@ -20,6 +20,11 @@ namespace OneMoreStepAPI.Models
         [Required]
         public string CoordinatesJSON { get; set; }
 
+        [Required]
+        public DateTime CreationDateTime { get; set; }
+
         public virtual User User { get; set; }
+        public virtual ICollection<RoutesPicture> RoutesPictures { get; set; }
+        public virtual ICollection<RoutesLikes> RoutesLikes { get; set; }
     }
 }

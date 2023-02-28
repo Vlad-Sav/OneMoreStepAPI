@@ -16,7 +16,8 @@ namespace OneMoreStepAPI.Models
         [Required]
         public string PasswordHash { get; set; }
 
-        public virtual ICollection<Route> Books { get; set; }
+        public virtual ICollection<Route> Routes { get; set; }
+        public virtual ICollection<UsersStepsCount> UsersStepsCounts { get; set; }
 
         //public string PasswordSalt { get; set; }
         //public string EmailAddress { get; set; }

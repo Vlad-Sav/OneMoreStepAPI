@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OneMoreStepAPI.Data;
 
 namespace OneMoreStepAPI.Migrations
 {
     [DbContext(typeof(OneMoreStepAPIDbContext))]
-    partial class OneMoreStepAPIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230228115831_adding routesPictures and usersStepsCount")]
+    partial class addingroutesPicturesandusersStepsCount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,9 +32,6 @@ namespace OneMoreStepAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreationDateTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -48,29 +47,6 @@ namespace OneMoreStepAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Routes");
-                });
-
-            modelBuilder.Entity("OneMoreStepAPI.Models.RoutesLikes", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("LikeDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RouteId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RouteId");
-
-                    b.ToTable("RoutesLikes");
                 });
 
             modelBuilder.Entity("OneMoreStepAPI.Models.RoutesPicture", b =>
@@ -148,17 +124,6 @@ namespace OneMoreStepAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OneMoreStepAPI.Models.RoutesLikes", b =>
-                {
-                    b.HasOne("OneMoreStepAPI.Models.Route", "Route")
-                        .WithMany("RoutesLikes")
-                        .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Route");
-                });
-
             modelBuilder.Entity("OneMoreStepAPI.Models.RoutesPicture", b =>
                 {
                     b.HasOne("OneMoreStepAPI.Models.Route", "Route")
@@ -183,8 +148,6 @@ namespace OneMoreStepAPI.Migrations
 
             modelBuilder.Entity("OneMoreStepAPI.Models.Route", b =>
                 {
-                    b.Navigation("RoutesLikes");
-
                     b.Navigation("RoutesPictures");
                 });
 

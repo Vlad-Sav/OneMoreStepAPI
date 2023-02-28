@@ -39,11 +39,15 @@ namespace OneMoreStepAPI.Controllers
         {
             var hash = CreatePasswordHash(userLogin.Password);
             userLogin.Password = hash;
-         
+
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == userLogin.Username);
+
+            if(user != null) return NotFound("User With This Username Already Exists");
+
             await _dbContext.AddAsync(new User { Username = userLogin.Username, PasswordHash = userLogin.Password });
             await _dbContext.SaveChangesAsync();
 
-            var user = await Authenticate(userLogin);
+            user = await Authenticate(userLogin);
 
             if (user != null)
             {
@@ -51,7 +55,7 @@ namespace OneMoreStepAPI.Controllers
                 return Ok(token);
             }
 
-            return NotFound("User not found");
+            return NotFound("User is Not Created");
         }
 
         [AllowAnonymous]

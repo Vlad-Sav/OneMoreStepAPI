@@ -15,5 +15,7 @@ namespace OneMoreStepAPI.Models.DTO
         public string Description { get; set; }
 
         public List<LatLong> Coordinates { get; set; }
+
+        public List<string> PicturesBase64 { get; set; }
     }
 }
