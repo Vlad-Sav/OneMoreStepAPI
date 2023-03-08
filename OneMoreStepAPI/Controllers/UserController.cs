@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -29,6 +30,20 @@ namespace OneMoreStepAPI.Controllers
         }
 
         [HttpGet]
+        public async Task<ActionResult> Get([FromQuery] int id)
+        {
+
+
+            return Ok("hello");
+        }
+
+        /// <summary>
+        /// Returns Information about user including username and routes
+        /// </summary>
+        /// <param name="id">Id of Required User</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("[action]")]
         public async Task<ActionResult> GetUser([FromQuery] int id)
         {
             var user = await _dbContext.Users.FindAsync(id);

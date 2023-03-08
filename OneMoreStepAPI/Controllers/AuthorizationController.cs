@@ -32,6 +32,11 @@ namespace OneMoreStepAPI.Controllers
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userLogin"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("[action]")]
@@ -57,7 +62,12 @@ namespace OneMoreStepAPI.Controllers
 
             return NotFound("User is Not Created");
         }
-
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userLogin"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("[action]")]
@@ -76,6 +86,11 @@ namespace OneMoreStepAPI.Controllers
             return NotFound("User not found");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         private string GenerateJwtToken(User user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -100,6 +115,11 @@ namespace OneMoreStepAPI.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userLogin"></param>
+        /// <returns></returns>
         private async Task<User> Authenticate(UserDTO userLogin)
         {
             var currentUser = await _dbContext.Users.FirstOrDefaultAsync(o =>

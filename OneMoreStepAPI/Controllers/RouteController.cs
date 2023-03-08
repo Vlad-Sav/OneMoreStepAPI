@@ -1,7 +1,5 @@
 ﻿using Amazon.S3;
-using Amazon.S3.Model;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,8 +9,6 @@ using OneMoreStepAPI.Models;
 using OneMoreStepAPI.Models.DTO;
 using OneMoreStepAPI.Utils;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -40,6 +36,11 @@ namespace OneMoreStepAPI.Controllers
             _bucketName = config["AmazonS3:BucketName"];
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="routeDTO"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> CreateRoute([FromBody] RouteDTO routeDTO)
@@ -85,6 +86,12 @@ namespace OneMoreStepAPI.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="route"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("[action]")]
         public async Task<IActionResult> UpdateRoute(int id, [FromBody] RouteDTO route)
@@ -111,6 +118,11 @@ namespace OneMoreStepAPI.Controllers
             return Ok(existingRoute);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("[action]")]
         public async Task<IActionResult> DeleteRoute(int id)
@@ -143,11 +155,8 @@ namespace OneMoreStepAPI.Controllers
                 return NotFound();
             }
            
-
             return Ok(route);
         }
-
-     
 
         /// <summary>
         /// 

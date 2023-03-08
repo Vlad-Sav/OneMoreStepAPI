@@ -19,6 +19,7 @@ namespace OneMoreStepAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class StepsController : BaseController
     {
         private IConfiguration _config;
@@ -31,7 +32,13 @@ namespace OneMoreStepAPI.Controllers
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stepsCount"></param>
+        /// <returns></returns>
         [HttpPost]
+        [Route("[action]")]
         public async Task<IActionResult> UpdateStepsCount([FromBody] int stepsCount)
         {
             var currentUserId = GetUserId();
@@ -71,6 +78,27 @@ namespace OneMoreStepAPI.Controllers
             }
             
             return Ok();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="daysNumber"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> GetUsersStepsCount([FromQuery] int userId, [FromQuery] int daysNumber)
+        {
+            var user = await _dbContext.Users.FindAsync(userId);
+            
+            if (user == null) return NotFound();
+
+            var usersStepsCount = await _dbContext.UsersStepsCount.Where(s => s.UserId == userId &&
+                                                                 (DateTime.Now.Date - s.Date.Date).TotalDays < 1)
+                                                                 .SumAsync(s => s.StepsCount);
+
+            return Ok(usersStepsCount);        
         }
     }
 }
