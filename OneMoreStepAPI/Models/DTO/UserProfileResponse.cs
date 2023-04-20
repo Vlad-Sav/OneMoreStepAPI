@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace OneMoreStepAPI.Models.DTO
 {
-    public class UserProfileDTO : ControllerBase
+    public class UserProfileResponse : ControllerBase
     {
         public string Username { get; set; }
 
-        public List<RouteDTO> Routes { get; set; }
+        //public List<RouteDTO> Routes { get; set; }
     }
 }

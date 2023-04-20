@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OneMoreStepAPI.Data;
 
 namespace OneMoreStepAPI.Migrations
 {
     [DbContext(typeof(OneMoreStepAPIDbContext))]
-    partial class OneMoreStepAPIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230408160617_Sticker models")]
+    partial class Stickermodels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,7 +107,7 @@ namespace OneMoreStepAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Stickers");
+                    b.ToTable("Sticker");
                 });
 
             modelBuilder.Entity("OneMoreStepAPI.Models.User", b =>
@@ -151,10 +153,7 @@ namespace OneMoreStepAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StickerId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("UsersPinnedStickers");
                 });
@@ -198,11 +197,18 @@ namespace OneMoreStepAPI.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserId1")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("StickerId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserId1")
+                        .IsUnique()
+                        .HasFilter("[UserId1] IS NOT NULL");
 
                     b.ToTable("UsersStickers");
                 });
@@ -242,19 +248,11 @@ namespace OneMoreStepAPI.Migrations
 
             modelBuilder.Entity("OneMoreStepAPI.Models.UsersPinnedSticker", b =>
                 {
-                    b.HasOne("OneMoreStepAPI.Models.Sticker", "Sticker")
-                        .WithMany()
-                        .HasForeignKey("StickerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("OneMoreStepAPI.Models.User", "User")
-                        .WithOne("UserPinnedSticker")
-                        .HasForeignKey("OneMoreStepAPI.Models.UsersPinnedSticker", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Sticker");
 
                     b.Navigation("User");
                 });
@@ -281,6 +279,10 @@ namespace OneMoreStepAPI.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("OneMoreStepAPI.Models.User", null)
+                        .WithOne("UserPinnedSticker")
+                        .HasForeignKey("OneMoreStepAPI.Models.UsersStickers", "UserId1");
 
                     b.Navigation("Sticker");
 

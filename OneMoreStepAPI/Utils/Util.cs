@@ -15,17 +15,7 @@ namespace OneMoreStepAPI
 {
     public static class Util
     {
-        public static string CreatePasswordHash(string password)
-        {
-            var crypt = new SHA256Managed();
-            string hash = String.Empty;
-            byte[] crypto = crypt.ComputeHash(Encoding.ASCII.GetBytes(password));
-            foreach (byte theByte in crypto)
-            {
-                hash += theByte.ToString("x2");
-            }
-            return hash;
-        }
+        
 
         public static MemoryStream Base64StringToImage(string base64String)
         {
@@ -51,7 +41,7 @@ namespace OneMoreStepAPI
             Descending
         }
 
-        public static IQueryable<Route> SortRoutes(IQueryable<Route> routes, IQueryable<RoutesLikes> routesLikes, RouteSortOption sortOption, SortOrder sortOrder = SortOrder.Ascending)
+        public static IQueryable<Route> SortRoutes(IQueryable<Route> routes, IQueryable<RoutesLikes> routesLikes, RouteSortOption sortOption, SortOrder sortOrder)
         {
             if (sortOption == RouteSortOption.Likes)
             {

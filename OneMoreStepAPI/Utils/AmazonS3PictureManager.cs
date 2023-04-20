@@ -20,17 +20,9 @@ namespace OneMoreStepAPI.Utils
             _client = client;
             _bucketName = bucketName;
         }
-        public async Task<FileContentResult> DownloadPicture(string filename)
-        {
-            /*// Введите свои данные для доступа к Amazon S3 в переменных accessKey, secretKey и bucketName
-            string accessKey = "AKIAWBN5LTTBJCBFX46S";
-            string secretKey = "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";
-            string bucketName = "onemorestepbucket";
 
-            // Создаем клиента Amazon S3 с использованием ключа доступа и секретного ключа
-            var s3Client = new AmazonS3Client(accessKey, secretKey, Amazon.RegionEndpoint.USEast1);
-*/
-            // Параметры запроса к Amazon S3
+        public async Task<byte[]> DownloadPicture(string filename)
+        {
             var request = new GetObjectRequest
             {
                 BucketName = _bucketName,
@@ -44,21 +36,7 @@ namespace OneMoreStepAPI.Utils
 
                 response.ResponseStream.CopyTo(fileStream);
                 var fileBytes = fileStream.ToArray();
-                var fileExtension = Path.GetExtension(filename);
-
-                // Возвращаем файл в соответствующем формате
-                switch (fileExtension)
-                {
-                    case ".pdf":
-                        return new FileContentResult(fileBytes, "application/pdf");
-                    case ".jpg":
-                    case ".jpeg":
-                        return new FileContentResult(fileBytes, "image/jpeg");
-                    case ".png":
-                        return new FileContentResult(fileBytes, "image/png");
-                    default:
-                        return null;
-                }
+                return fileBytes;
             }
         }
 
@@ -84,7 +62,6 @@ namespace OneMoreStepAPI.Utils
 
             // Сохраняем имя файла в объекте MyObject
             return fileName;
-
         }
     }
 }

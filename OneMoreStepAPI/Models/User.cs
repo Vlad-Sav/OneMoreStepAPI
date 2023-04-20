@@ -10,19 +10,20 @@ namespace OneMoreStepAPI.Models
     public class User: BaseModel
     {
         [Required]
-        [StringLength(20)]
         public string Username { get; set; }
 
         [Required]
-        public string PasswordHash { get; set; }
+        public string Email { get; set; }
+
+        [Required]
+        public byte[] PasswordHash { get; set; } = new byte[32];
+
+        [Required]
+        public byte[] PasswordSalt { get; set; } = new byte[32];
 
         public virtual ICollection<Route> Routes { get; set; }
         public virtual ICollection<UsersStepsCount> UsersStepsCounts { get; set; }
-
-        //public string PasswordSalt { get; set; }
-        //public string EmailAddress { get; set; }
-        //public string Role { get; set; }
-        //public string Surname { get; set; }
-        //public string GivenName { get; set; }
+        public virtual ICollection<UsersStickers> UsersStickers { get; set; }
+        public virtual UsersPinnedSticker UserPinnedSticker { get; set; }
     }
 }

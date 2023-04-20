@@ -7,6 +7,7 @@ using OneMoreStepAPI.Controllers.Base;
 using OneMoreStepAPI.Data;
 using OneMoreStepAPI.Models;
 using OneMoreStepAPI.Models.DTO;
+using OneMoreStepAPI.Models.Settings;
 using OneMoreStepAPI.Utils;
 using System;
 using System.Linq;
@@ -18,22 +19,16 @@ namespace OneMoreStepAPI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class RouteController : BaseController
+    public class RouteController : AmazonController
     {
-        private IConfiguration _config;
-
         private OneMoreStepAPIDbContext _dbContext;
 
-        private AmazonS3Client _amazonClient;
-
-        private string _bucketName;
-
-        public RouteController(IConfiguration config, OneMoreStepAPIDbContext dbContext, AmazonS3Client amazonClient)
+        public RouteController(IConfiguration config, 
+            OneMoreStepAPIDbContext dbContext, 
+            AmazonS3Client amazonClient, 
+            BucketName bucketName): base(config, amazonClient, bucketName)
         {
-            _config = config;
             _dbContext = dbContext;
-            _amazonClient = amazonClient;
-            _bucketName = config["AmazonS3:BucketName"];
         }
 
         /// <summary>
@@ -42,13 +37,12 @@ namespace OneMoreStepAPI.Controllers
         /// <param name="routeDTO"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("[action]")]
-        public async Task<IActionResult> CreateRoute([FromBody] RouteDTO routeDTO)
+        public async Task<IActionResult> CreateRoute([FromBody] RouteSaveRequest routeDTO)
         {
             var route = new Route
             {
-                Title = routeDTO.Title,
-                Description = routeDTO.Description,
+                Title = routeDTO.RouteTitle,
+                Description = routeDTO.RouteDescription,
                 UserId = GetUserId(),
                 CoordinatesJSON = JsonSerializer.Serialize(routeDTO.Coordinates)
             };
@@ -65,7 +59,7 @@ namespace OneMoreStepAPI.Controllers
             }
             
             //Adding pictures pathes on Amazon S3 related to route to database
-            foreach (var picture in routeDTO.PicturesBase64)
+           /* foreach (var picture in routeDTO.PicturesBase64)
             {
                 var pictureName = await SendPictureToAmazonS3(picture);
                 var routePicture = new RoutesPicture
@@ -82,7 +76,7 @@ namespace OneMoreStepAPI.Controllers
                 {
                     return NotFound();
                 }
-            }
+            }*/
             return Ok();
         }
 
@@ -94,7 +88,7 @@ namespace OneMoreStepAPI.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("[action]")]
-        public async Task<IActionResult> UpdateRoute(int id, [FromBody] RouteDTO route)
+        public async Task<IActionResult> UpdateRoute(int id, [FromBody] RouteSaveRequest route)
         {
             var existingRoute = await _dbContext.Routes.FindAsync(id);
 
@@ -103,8 +97,8 @@ namespace OneMoreStepAPI.Controllers
                 return NotFound();
             }
 
-            existingRoute.Title = route.Title;
-            existingRoute.Description = route.Description;
+            existingRoute.Title = route.RouteTitle;
+            existingRoute.Description = route.RouteDescription;
 
             try
             {
@@ -124,8 +118,7 @@ namespace OneMoreStepAPI.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("[action]")]
-        public async Task<IActionResult> DeleteRoute(int id)
+        public async Task<IActionResult> DeleteRoute([FromQuery] int id)
         {
             var route = await _dbContext.Routes.FindAsync(id);
 
@@ -164,7 +157,7 @@ namespace OneMoreStepAPI.Controllers
         /// <param name="filename"></param>
         /// <returns></returns>
         [NonAction]
-        public async Task<IActionResult> GetPictureFromAmazonS3(string filename)
+        public async Task<byte[]> GetPictureFromAmazonS3(string filename)
         {
             AmazonS3PictureManager manager = new AmazonS3PictureManager(_amazonClient, _bucketName);
 

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace OneMoreStepAPI.Models.DTO
 {
-    public class LatLong
+    public class LatLng
     {
-        public double Lat { get; set; }
-        public double Long { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
     }
 }

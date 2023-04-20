@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OneMoreStepAPI.Data;
 
 namespace OneMoreStepAPI.Migrations
 {
     [DbContext(typeof(OneMoreStepAPIDbContext))]
-    partial class OneMoreStepAPIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230317080031_Change User Model")]
+    partial class ChangeUserModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,21 +95,6 @@ namespace OneMoreStepAPI.Migrations
                     b.ToTable("RoutesPictures");
                 });
 
-            modelBuilder.Entity("OneMoreStepAPI.Models.Sticker", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Url")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Stickers");
-                });
-
             modelBuilder.Entity("OneMoreStepAPI.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -136,29 +123,6 @@ namespace OneMoreStepAPI.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("OneMoreStepAPI.Models.UsersPinnedSticker", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("StickerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StickerId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("UsersPinnedStickers");
-                });
-
             modelBuilder.Entity("OneMoreStepAPI.Models.UsersStepsCount", b =>
                 {
                     b.Property<int>("Id")
@@ -180,31 +144,6 @@ namespace OneMoreStepAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UsersStepsCount");
-                });
-
-            modelBuilder.Entity("OneMoreStepAPI.Models.UsersStickers", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("StickerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StikerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StickerId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UsersStickers");
                 });
 
             modelBuilder.Entity("OneMoreStepAPI.Models.Route", b =>
@@ -240,25 +179,6 @@ namespace OneMoreStepAPI.Migrations
                     b.Navigation("Route");
                 });
 
-            modelBuilder.Entity("OneMoreStepAPI.Models.UsersPinnedSticker", b =>
-                {
-                    b.HasOne("OneMoreStepAPI.Models.Sticker", "Sticker")
-                        .WithMany()
-                        .HasForeignKey("StickerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OneMoreStepAPI.Models.User", "User")
-                        .WithOne("UserPinnedSticker")
-                        .HasForeignKey("OneMoreStepAPI.Models.UsersPinnedSticker", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Sticker");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("OneMoreStepAPI.Models.UsersStepsCount", b =>
                 {
                     b.HasOne("OneMoreStepAPI.Models.User", "User")
@@ -270,23 +190,6 @@ namespace OneMoreStepAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OneMoreStepAPI.Models.UsersStickers", b =>
-                {
-                    b.HasOne("OneMoreStepAPI.Models.Sticker", "Sticker")
-                        .WithMany("UsersStickers")
-                        .HasForeignKey("StickerId");
-
-                    b.HasOne("OneMoreStepAPI.Models.User", "User")
-                        .WithMany("UsersStickers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Sticker");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("OneMoreStepAPI.Models.Route", b =>
                 {
                     b.Navigation("RoutesLikes");
@@ -294,20 +197,11 @@ namespace OneMoreStepAPI.Migrations
                     b.Navigation("RoutesPictures");
                 });
 
-            modelBuilder.Entity("OneMoreStepAPI.Models.Sticker", b =>
-                {
-                    b.Navigation("UsersStickers");
-                });
-
             modelBuilder.Entity("OneMoreStepAPI.Models.User", b =>
                 {
                     b.Navigation("Routes");
 
-                    b.Navigation("UserPinnedSticker");
-
                     b.Navigation("UsersStepsCounts");
-
-                    b.Navigation("UsersStickers");
                 });
 #pragma warning restore 612, 618
         }

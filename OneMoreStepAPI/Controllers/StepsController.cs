@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using OneMoreStepAPI.Controllers.Base;
 using OneMoreStepAPI.Data;
 using OneMoreStepAPI.Models;
+using OneMoreStepAPI.Services;
 using OneMoreStepAPI.Utils;
 using System;
 using System.Collections.Generic;
@@ -21,15 +22,12 @@ namespace OneMoreStepAPI.Controllers
     [ApiController]
     [Authorize]
     public class StepsController : BaseController
-    {
-        private IConfiguration _config;
+    { 
+        private StepsService _service;
 
-        private OneMoreStepAPIDbContext _dbContext;
-
-        public StepsController(IConfiguration config, OneMoreStepAPIDbContext dbContext)
+        public StepsController(IConfiguration config, StepsService service): base(config)
         {
-            _config = config;
-            _dbContext = dbContext;
+            _service = service;
         }
 
         /// <summary>
@@ -42,41 +40,13 @@ namespace OneMoreStepAPI.Controllers
         public async Task<IActionResult> UpdateStepsCount([FromBody] int stepsCount)
         {
             var currentUserId = GetUserId();
-            UsersStepsCount userStepsCount = await _dbContext.UsersStepsCount.FirstOrDefaultAsync(c => (c.UserId == currentUserId)
-                                                                                && (c.Date.Date == DateTime.Today));
+            var result = await _service.UpdateStepsCountAsync(currentUserId, stepsCount);
 
-            if (userStepsCount == null)
+            if (!result)
             {
-                userStepsCount = new UsersStepsCount
-                {
-                    UserId = GetUserId(),
-                    StepsCount = stepsCount,
-                    Date = DateTime.Today
-                };
-                _dbContext.UsersStepsCount.Add(userStepsCount);
-                try
-                {
-                    await _dbContext.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    return NotFound();
-                }
+                return BadRequest();
+            }
 
-            }
-            else
-            {
-                _dbContext.UsersStepsCount.Update(userStepsCount);
-                try
-                {
-                    await _dbContext.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    return NotFound();
-                }
-            }
-            
             return Ok();
         }
 
@@ -88,15 +58,11 @@ namespace OneMoreStepAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> GetUsersStepsCount([FromQuery] int userId, [FromQuery] int daysNumber)
+        public async Task<IActionResult> UsersStepsCount([FromQuery] int userId, [FromQuery] int daysNumber)
         {
-            var user = await _dbContext.Users.FindAsync(userId);
+            var usersStepsCount = await _service.GetUsersStepsCount(userId, daysNumber);
             
-            if (user == null) return NotFound();
-
-            var usersStepsCount = await _dbContext.UsersStepsCount.Where(s => s.UserId == userId &&
-                                                                 (DateTime.Now.Date - s.Date.Date).TotalDays < 1)
-                                                                 .SumAsync(s => s.StepsCount);
+            if (usersStepsCount < 0) return BadRequest();
 
             return Ok(usersStepsCount);        
         }

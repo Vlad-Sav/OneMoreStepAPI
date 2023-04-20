@@ -12,6 +12,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OneMoreStepAPI.Data;
+using OneMoreStepAPI.Models.Settings;
+using OneMoreStepAPI.Services;
+using OneMoreStepAPI.Services.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,8 +78,15 @@ namespace OneMoreStepAPI
             //Adding Amazon S3 Service
             services.AddAWSService<IAmazonS3>();
             //Adding Amazon S3 to DI Container
-            var amazonS3Client = new AmazonS3Client(Configuration["AmazonS3:AccessKey"], Configuration["AmazonS3:SecretKey"], Amazon.RegionEndpoint.USEast1);
+            var amazonS3Client = new AmazonS3Client(Configuration["Aws:AccessKey"], Configuration["Aws:SecretKey"], Amazon.RegionEndpoint.USEast1);
             services.AddSingleton(amazonS3Client);
+            //Amazon bucket name to DI Container
+            var amazonBucketName = new BucketName { BuckName = Configuration["Aws:BucketName"] };
+            services.AddSingleton(amazonBucketName);
+
+            //Adding services
+            services.AddScoped<IStickersService, StickersService>();
+            services.AddScoped<IStepsService, StepsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
