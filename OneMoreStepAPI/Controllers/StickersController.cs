@@ -9,6 +9,7 @@ using OneMoreStepAPI.Models;
 using OneMoreStepAPI.Models.DTO;
 using OneMoreStepAPI.Models.Settings;
 using OneMoreStepAPI.Services;
+using OneMoreStepAPI.Services.Base;
 using OneMoreStepAPI.Utils;
 using System;
 using System.Collections.Generic;
@@ -22,11 +23,11 @@ namespace OneMoreStepAPI.Controllers
     [Authorize]
     public class StickersController : AmazonController
     {
-        private StickersService _service;
+        private IStickersService _service;
         public StickersController(IConfiguration config, 
             AmazonS3Client amazonClient, 
             BucketName bucketName,
-            StickersService service): base(config, amazonClient, bucketName)
+            IStickersService service): base(config, amazonClient, bucketName)
         {
             _service = service;
         }

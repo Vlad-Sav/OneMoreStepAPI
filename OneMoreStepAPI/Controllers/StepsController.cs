@@ -9,6 +9,7 @@ using OneMoreStepAPI.Controllers.Base;
 using OneMoreStepAPI.Data;
 using OneMoreStepAPI.Models;
 using OneMoreStepAPI.Services;
+using OneMoreStepAPI.Services.Base;
 using OneMoreStepAPI.Utils;
 using System;
 using System.Collections.Generic;
@@ -23,9 +24,9 @@ namespace OneMoreStepAPI.Controllers
     [Authorize]
     public class StepsController : BaseController
     { 
-        private StepsService _service;
+        private IStepsService _service;
 
-        public StepsController(IConfiguration config, StepsService service): base(config)
+        public StepsController(IConfiguration config, IStepsService service): base(config)
         {
             _service = service;
         }

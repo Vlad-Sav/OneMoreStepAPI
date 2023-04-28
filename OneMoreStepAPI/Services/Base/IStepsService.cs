@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace OneMoreStepAPI.Services.Base
 {
-    interface IStepsService
+    public interface IStepsService
     {
         public Task<bool> UpdateStepsCountAsync(int userId, int stepsCount);
-        public Task<UsersStepsCount> GetUsersStepsCount(int userId);
+        public Task<int> GetUsersStepsCount(int userId, int daysNumber);
     }
 }
