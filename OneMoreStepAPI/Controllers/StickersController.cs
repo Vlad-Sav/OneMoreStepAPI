@@ -62,5 +62,44 @@ namespace OneMoreStepAPI.Controllers
             var stickerBase64 = Convert.ToBase64String(sticker.ToArray());
             return Ok(new UsersPinnedStickerResponse { Sticker = stickerBase64 });
         }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> StickersNumber()
+        {
+            try
+            {
+                var res = await _service.GetStickersCount();
+                if (res == null) return BadRequest();
+                return Ok(new StickersNumberResponse() { StickersNumber = res });
+            }
+            catch
+            { 
+            }
+            return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> Sticker(int id)
+        {
+            byte[] sticker;
+
+            try
+            {
+                sticker = await GetPictureFromAmazonS3($"Stickers/{id}.png");
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
+
+            if (sticker == null)
+            {
+                return NotFound();
+            }
+            var stickerBase64 = Convert.ToBase64String(sticker.ToArray());
+            return Ok(new UsersPinnedStickerResponse { Sticker = stickerBase64 });
+        }
     }
 }

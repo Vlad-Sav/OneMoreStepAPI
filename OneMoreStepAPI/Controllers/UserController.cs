@@ -7,6 +7,7 @@ using OneMoreStepAPI.Controllers.Base;
 using OneMoreStepAPI.Data;
 using OneMoreStepAPI.Models;
 using OneMoreStepAPI.Models.DTO;
+using OneMoreStepAPI.Services.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,12 +21,12 @@ namespace OneMoreStepAPI.Controllers
     [Authorize]
     public class UserController : BaseController
     {
-        private OneMoreStepAPIDbContext _dbContext;
+        private IUserService _service;
 
-        public UserController(IConfiguration config, OneMoreStepAPIDbContext dbContext): base(config)
+        public UserController(IConfiguration config, IUserService service): base(config)
         {
             _config = config;
-            _dbContext = dbContext;
+            _service = service;
         }
 
         [HttpGet]
@@ -44,27 +45,17 @@ namespace OneMoreStepAPI.Controllers
         [Route("[action]")]
         public async Task<ActionResult> UserProfile()
         {
-            var user = await _dbContext.Users.FindAsync(GetUserId());
+            var userId = GetUserId();
+            var user = _service.GetUser(userId);
             
             if (user == null) return NotFound();
+
+            var userProfile = _service.UserProfile(userId);
             
-            List<RouteSaveRequest> routes = await _dbContext.Routes.Where(r => r.UserId == user.Id).Select(r => new RouteSaveRequest
-            {
-                RouteTitle = r.Title,
-                RouteDescription = r.Description,
-                Coordinates = JsonSerializer.Deserialize<List<LatLng>>(r.CoordinatesJSON, null)
-            }).ToListAsync();
-
-            var userProfile = new UserProfileResponse
-            {
-                Username = user.Username,
-                //Routes = routes
-            };
-
             return Ok(userProfile);
         }
 
-        [HttpGet]
+       /* [HttpGet]
         [Route("[action]")]
         public async Task<ActionResult<IEnumerable<User>>> TopByStepsCount([FromQuery] string period)
         {
@@ -91,6 +82,6 @@ namespace OneMoreStepAPI.Controllers
                 .ToListAsync();
 
             return Ok(users);
-        }
+        }*/
     }
 }

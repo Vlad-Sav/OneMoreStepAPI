@@ -16,6 +16,11 @@ namespace OneMoreStepAPI.Services
         {
         }
 
+        public async Task<int> GetStickersCount()
+        {
+            return await _dbContext.Stickers.CountAsync();
+        }
+
         public async Task<UsersPinnedSticker> GetUserPinnedStickerAsync(int userId)
         {
             var usersPinnedSticker = await _dbContext.UsersPinnedStickers

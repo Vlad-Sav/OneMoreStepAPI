@@ -16,6 +16,8 @@ using OneMoreStepAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using OneMoreStepAPI.Controllers.Base;
 using System.Security.Cryptography;
+using OneMoreStepAPI.Services;
+using OneMoreStepAPI.Services.Base;
 
 namespace OneMoreStepAPI.Controllers
 {
@@ -23,11 +25,11 @@ namespace OneMoreStepAPI.Controllers
     [ApiController]
     public class AuthorizationController : BaseController
     {
-        private OneMoreStepAPIDbContext _dbContext;
+        private IOmsAuthorizationService _service;
 
-        public AuthorizationController(IConfiguration config, OneMoreStepAPIDbContext dbContext): base(config)
+        public AuthorizationController(IConfiguration config, IOmsAuthorizationService service): base(config)
         {
-            _dbContext = dbContext;
+            _service = service;
         }
 
         /// <summary>
@@ -40,37 +42,20 @@ namespace OneMoreStepAPI.Controllers
         [Route("[action]")]
         public async Task<ActionResult<User>> Register([FromBody] UserRegisterRequest userRegisterRequest)
         {
-            if (_dbContext.Users.Any(u => u.Email == userRegisterRequest.Email))
+            try
             {
-                return BadRequest("User with this Email already exists.");
+                await _service.Register(userRegisterRequest);
+
+                var user = await ConfirmLoginData(userRegisterRequest.Email, userRegisterRequest.Password);
+
+                if (user != null)
+                {
+                    return Ok();
+                }
             }
+            catch (Exception){}
 
-            if (_dbContext.Users.Any(u => u.Username == userRegisterRequest.Username))
-            {
-                return BadRequest("User with this Username already exists.");
-            }
-
-            CreatePasswordHash(userRegisterRequest.Password, 
-                out byte[] passwordHash,
-                out byte[] passwordSalt);
- 
-            await _dbContext.AddAsync(new User { 
-                Email = userRegisterRequest.Email,
-                Username = userRegisterRequest.Username, 
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt
-                });
-            await _dbContext.SaveChangesAsync();
-
-            var user = await ConfirmLoginData(userRegisterRequest.Email, userRegisterRequest.Password);
-
-            if (user != null)
-            {
-                var token = GenerateJwtToken(user);
-                return Ok();
-            }
-
-            return Ok("User is Not Registered");
+            return Conflict("User is Not Registered");
         }
         
         /// <summary>
@@ -86,7 +71,7 @@ namespace OneMoreStepAPI.Controllers
             User user = null;
             try
             {
-                user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == userLoginRequest.Email);
+                user = await _service.Login(userLoginRequest);
                 if (user == null)
                 {
                     return BadRequest("User is not found.");
@@ -96,8 +81,7 @@ namespace OneMoreStepAPI.Controllers
             {
                 return BadRequest(e.Message);
             }
-           
-            
+          
             user = await ConfirmLoginData(userLoginRequest.Email, userLoginRequest.Password);
 
             if (user != null)
@@ -142,9 +126,7 @@ namespace OneMoreStepAPI.Controllers
         /// <returns></returns>
         private async Task<User> ConfirmLoginData(string email, string password)
         {
-            var currentUser = await _dbContext.Users.FirstOrDefaultAsync(o =>
-                o.Email.ToLower() == email.ToLower() 
-            );
+            var currentUser = await _service.ConfirmLoginData(email, password);
             
             if (currentUser == null)
             {
@@ -157,22 +139,6 @@ namespace OneMoreStepAPI.Controllers
             }
 
             return currentUser;    
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="password"></param>
-        /// <param name="passwordHash"></param>
-        /// <param name="passwordSalt"></param>
-        private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac
-                    .ComputeHash(Encoding.UTF8.GetBytes(password));
-            }
         }
 
         /// <summary>

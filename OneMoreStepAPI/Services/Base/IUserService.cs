@@ -1,4 +1,5 @@
 ﻿using OneMoreStepAPI.Models;
+using OneMoreStepAPI.Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace OneMoreStepAPI.Services.Base
 {
-    public interface IStickersService
+    public interface IUserService
     {
-        public Task<UsersPinnedSticker> GetUserPinnedStickerAsync(int userId);
-
-        public Task<int> GetStickersCount();
-        
+        public Task<UserProfileResponse> UserProfile(int userId);
+        public Task<User> GetUser(int userId);
     }
 }
