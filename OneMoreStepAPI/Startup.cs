@@ -89,6 +89,7 @@ namespace OneMoreStepAPI
             services.AddScoped<IStepsService, StepsService>();
             services.AddScoped<IOmsAuthorizationService, AuthorizationService>();
             services.AddScoped<IRoutesService, RoutesService>();
+            services.AddScoped<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

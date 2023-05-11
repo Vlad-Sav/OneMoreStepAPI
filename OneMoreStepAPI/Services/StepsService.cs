@@ -33,6 +33,7 @@ namespace OneMoreStepAPI.Services
             }
             else
             {
+                usersStepsCount.StepsCount = stepsCount;
                 _dbContext.UsersStepsCount.Update(usersStepsCount);
             }
 

@@ -11,6 +11,7 @@ namespace OneMoreStepAPI.Services.Base
         public Task<UsersPinnedSticker> GetUserPinnedStickerAsync(int userId);
 
         public Task<int> GetStickersCount();
-        
+
+        public Task<(int, bool)> RandomSticker(int userId);
     }
 }

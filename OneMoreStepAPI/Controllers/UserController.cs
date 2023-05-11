@@ -46,20 +46,22 @@ namespace OneMoreStepAPI.Controllers
         public async Task<ActionResult> UserProfile()
         {
             var userId = GetUserId();
-            var user = _service.GetUser(userId);
+            var user = await _service.GetUser(userId);
             
             if (user == null) return NotFound();
 
-            var userProfile = _service.UserProfile(userId);
+            var userProfile = await _service.UserProfile(user);
             
             return Ok(userProfile);
         }
 
-       /* [HttpGet]
+        [HttpGet]
         [Route("[action]")]
-        public async Task<ActionResult<IEnumerable<User>>> TopByStepsCount([FromQuery] string period)
+        public async Task<IActionResult> TopUsers()//[FromQuery] string period)
         {
-            DateTime fromDate;
+            var res = await _service.GetTopUser();
+            return Ok(res);
+          /*  DateTime fromDate;
             switch (period.ToLower())
             {
                 case "today":
@@ -81,7 +83,7 @@ namespace OneMoreStepAPI.Controllers
                 .OrderByDescending(u => u.UsersStepsCounts.Where(usc => usc.Date >= fromDate).Sum(usc => usc.StepsCount))
                 .ToListAsync();
 
-            return Ok(users);
-        }*/
+            return Ok(users);*/
+        }
     }
 }

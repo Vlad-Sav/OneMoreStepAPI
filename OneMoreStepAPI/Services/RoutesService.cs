@@ -48,8 +48,50 @@ namespace OneMoreStepAPI.Services
                 cfg.AddProfile<OMSAutoMapper>();
             });
             var mapper = new Mapper(config);
-            var res = await _dbContext.Routes.Select(r => mapper.Map<RouteResponse>(r)).ToListAsync();
+            var res = await _dbContext.Routes.Include("User").Select(r => mapper.Map<RouteResponse>(r)).ToListAsync();
             return res;
+        }
+
+        public async Task<bool> Like(int userId, int routeId)
+        {
+            var isLiked = await _dbContext.RoutesLikes.AnyAsync(l => l.RouteId == routeId && l.UserId == userId);
+            if (isLiked) {
+                return false;
+            }
+            try
+            {
+                await _dbContext.RoutesLikes.AddAsync(new RoutesLikes
+                {
+                    RouteId = routeId,
+                    UserId = userId
+                });
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> Unlike(int userId, int routeId)
+        {
+            var isLiked = await _dbContext.RoutesLikes.AnyAsync(l => l.RouteId == routeId && l.UserId == userId);
+            if (!isLiked)
+            {
+                return false;
+            }
+            try
+            {
+                var like = await _dbContext.RoutesLikes.FirstOrDefaultAsync(l => l.RouteId == routeId && l.UserId == userId);
+                _dbContext.RoutesLikes.Remove(like);
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

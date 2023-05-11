@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using OneMoreStepAPI.Controllers.Base;
 using OneMoreStepAPI.Data;
 using OneMoreStepAPI.Models;
+using OneMoreStepAPI.Models.DTO;
 using OneMoreStepAPI.Services;
 using OneMoreStepAPI.Services.Base;
 using OneMoreStepAPI.Utils;
@@ -38,10 +39,10 @@ namespace OneMoreStepAPI.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> UpdateStepsCount([FromBody] int stepsCount)
+        public async Task<IActionResult> UpdateStepsCount([FromBody] UpdateStepsCountRequest stepsCount)
         {
             var currentUserId = GetUserId();
-            var result = await _service.UpdateStepsCountAsync(currentUserId, stepsCount);
+            var result = await _service.UpdateStepsCountAsync(currentUserId, stepsCount.StepsCount);
 
             if (!result)
             {

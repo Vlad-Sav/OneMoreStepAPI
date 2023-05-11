@@ -143,5 +143,22 @@ namespace OneMoreStepAPI.Controllers
            *//*
             return Ok();
         }*/
+        [HttpPost]
+        [Route("[action]/{routeId}")]
+        public async Task<IActionResult> Like(int routeId)
+        {
+            var res = await _service.Like(GetUserId(), routeId);
+            if (!res) return BadRequest();
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("[action]/{routeId}")]
+        public async Task<IActionResult> Dislike(int routeId)
+        {
+            var res = await _service.Like(GetUserId(), routeId);
+            if (!res) return BadRequest();
+            return Ok();
+        }
     }
 }

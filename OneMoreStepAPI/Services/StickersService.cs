@@ -33,5 +33,24 @@ namespace OneMoreStepAPI.Services
             }
             return usersPinnedSticker;
         }
+
+        public async Task<(int, bool)> RandomSticker(int userId)
+        {
+            var stickersCount = await GetStickersCount();
+            var randomStickerId = new Random().Next(1, stickersCount + 1);
+
+            var alreadyHave = await _dbContext
+                                        .UsersStickers
+                                        .Where(s => s.UserId == userId)
+                                        .AnyAsync(s => s.StikerId == randomStickerId);
+
+            if (!alreadyHave) {
+                await _dbContext.UsersStickers.AddAsync(
+                    new UsersStickers { StikerId = randomStickerId, UserId = userId });
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return (randomStickerId, alreadyHave);
+        }
     }
 }

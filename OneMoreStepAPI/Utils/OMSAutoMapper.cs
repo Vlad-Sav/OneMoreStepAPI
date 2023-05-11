@@ -21,10 +21,13 @@ namespace OneMoreStepAPI.Utils
             CreateMap<User, UserProfileResponse>()
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username));
 
-            CreateMap<Route, RouteResponse>()
+            _ = CreateMap<Route, RouteResponse>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description));
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Username))
+                .ForMember(dest => dest.LocationList, opt => opt.MapFrom(src => JsonSerializer.Deserialize<List<LatLng>>(src.CoordinatesJSON, null)));
         }
     }
 }
