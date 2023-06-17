@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OneMoreStepAPI.Data;
 
 namespace OneMoreStepAPI.Migrations
 {
     [DbContext(typeof(OneMoreStepAPIDbContext))]
-    partial class OneMoreStepAPIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230524064435_Chests")]
+    partial class Chests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,27 +59,6 @@ namespace OneMoreStepAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Levels");
-                });
-
-            modelBuilder.Entity("OneMoreStepAPI.Models.ProfilePhotos", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("PhotoPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("ProfilePhotos");
                 });
 
             modelBuilder.Entity("OneMoreStepAPI.Models.Progress", b =>
@@ -310,17 +291,6 @@ namespace OneMoreStepAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("OneMoreStepAPI.Models.ProfilePhotos", b =>
-                {
-                    b.HasOne("OneMoreStepAPI.Models.User", "User")
-                        .WithOne("ProfilePhoto")
-                        .HasForeignKey("OneMoreStepAPI.Models.ProfilePhotos", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("OneMoreStepAPI.Models.Progress", b =>
                 {
                     b.HasOne("OneMoreStepAPI.Models.User", "User")
@@ -429,8 +399,6 @@ namespace OneMoreStepAPI.Migrations
                     b.Navigation("Chests");
 
                     b.Navigation("Levels");
-
-                    b.Navigation("ProfilePhoto");
 
                     b.Navigation("Progress");
 

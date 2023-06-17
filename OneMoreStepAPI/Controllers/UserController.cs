@@ -57,33 +57,41 @@ namespace OneMoreStepAPI.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> TopUsers()//[FromQuery] string period)
+        public async Task<IActionResult> TopUsers()
         {
             var res = await _service.GetTopUser();
             return Ok(res);
-          /*  DateTime fromDate;
-            switch (period.ToLower())
-            {
-                case "today":
-                    fromDate = DateTime.Today;
-                    break;
-                case "week":
-                    fromDate = DateTime.Today.AddDays(-7);
-                    break;
-                case "month":
-                    fromDate = DateTime.Today.AddMonths(-1);
-                    break;
-                default:
-                    return BadRequest("Invalid period specified.");
-            }
-
-            var users = await _dbContext.Users
-                .Include(u => u.UsersStepsCounts)
-                .Where(u => u.UsersStepsCounts.Any(usc => usc.Date >= fromDate))
-                .OrderByDescending(u => u.UsersStepsCounts.Where(usc => usc.Date >= fromDate).Sum(usc => usc.StepsCount))
-                .ToListAsync();
-
-            return Ok(users);*/
         }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> TopUsersForWeek()
+        {
+            var res = await _service.GetTopUserForWeek();
+            return Ok(res);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> TopUsersForMonth()
+        {
+            var res = await _service.GetTopUserForMonth();
+            return Ok(res);
+        }
+
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public async Task<ActionResult> UserProfile(int id)
+        {
+            var user = await _service.GetUser(id);
+
+            if (user == null) return NotFound();
+
+            var userProfile = await _service.UserProfile(user);
+
+            return Ok(userProfile);
+        }
+
+       
     }
 }

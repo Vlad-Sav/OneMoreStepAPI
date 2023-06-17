@@ -12,5 +12,7 @@ namespace OneMoreStepAPI.Services.Base
         public Task<UserProfileResponse> UserProfile(User user);
         public Task<User> GetUser(int userId);
         public Task<List<Top3UserResponse>> GetTopUser();
+        public Task<List<Top3UserResponse>> GetTopUserForWeek();
+        public Task<List<Top3UserResponse>> GetTopUserForMonth();
     }
 }

@@ -42,8 +42,8 @@ namespace OneMoreStepAPI.Controllers
         public async Task<IActionResult> UpdateStepsCount([FromBody] UpdateStepsCountRequest stepsCount)
         {
             var currentUserId = GetUserId();
-            var result = await _service.UpdateStepsCountAsync(currentUserId, stepsCount.StepsCount);
-
+            var delta = await _service.UpdateStepsCountAsync(currentUserId, stepsCount.StepsCount);
+            var result = await _service.UpdateProgressAndLevel(currentUserId, delta);
             if (!result)
             {
                 return BadRequest();
@@ -60,13 +60,65 @@ namespace OneMoreStepAPI.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> UsersStepsCount([FromQuery] int userId, [FromQuery] int daysNumber)
+        public async Task<IActionResult> UsersStepsCount()
         {
-            var usersStepsCount = await _service.GetUsersStepsCount(userId, daysNumber);
-            
-            if (usersStepsCount < 0) return BadRequest();
+            var usersStepsCount = await _service.GetUsersStepsCount(GetUserId());
 
             return Ok(usersStepsCount);        
         }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> Progress()
+        {
+            var progress = await _service.GetUsersProgress(GetUserId());
+
+            if (progress < 0) return BadRequest();
+
+            return Ok(new IntResponse() { Value = progress } );
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> Level()
+        {
+            var level = await _service.GetUsersLevel(GetUserId());
+
+            if (level < 0) return BadRequest();
+
+            return Ok(new IntResponse() { Value = level });
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> Chests()
+        {
+            var chests = await _service.GetUsersChestsCount(GetUserId());
+
+            if (chests < 0) return BadRequest();
+
+            return Ok(new IntResponse() { Value = chests });
+        }
+
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> Level(int id)
+        {
+            var level = await _service.GetUsersLevel(id);
+
+            if (level < 0) return BadRequest();
+
+            return Ok(new IntResponse() { Value = level });
+        }
+
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> UsersStepsCount(int id)
+        {
+            var usersStepsCount = await _service.GetUsersStepsCount(id);
+
+            return Ok(usersStepsCount);
+        }
+
     }
 }

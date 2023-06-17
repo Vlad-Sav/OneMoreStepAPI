@@ -12,6 +12,7 @@ using OneMoreStepAPI.Services;
 using OneMoreStepAPI.Services.Base;
 using OneMoreStepAPI.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -40,6 +41,23 @@ namespace OneMoreStepAPI.Controllers
             return Ok(res);
         }
 
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> MyRoutes()
+        {
+            var res = await _service.MyRoutes(GetUserId());
+            return Ok(res);
+        }
+
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> Routes(int id)
+        {
+            var res = await _service.MyRoutes(id);
+            return Ok(res);
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -48,30 +66,49 @@ namespace OneMoreStepAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRoute([FromBody] RouteSaveRequest routeDTO)
         {
-            if (await _service.CreateRoute(routeDTO, GetUserId())){
-                return Ok();
+            var res = await _service.CreateRoute(routeDTO, GetUserId());
+            if (res != null){
+                //Adding pictures pathes on Amazon S3 related to route to database
+                foreach (var picture in routeDTO.Photos)
+                {
+                    var pictureName = await SendPictureToAmazonS3(picture);
+                    await _service.AddPhoto(res.Id, pictureName);
+                }
             }
-            //Adding pictures pathes on Amazon S3 related to route to database
-            /* foreach (var picture in routeDTO.PicturesBase64)
-             {
-                 var pictureName = await SendPictureToAmazonS3(picture);
-                 var routePicture = new RoutesPicture
-                 {
-                     RouteId = addedRoute.Entity.Id,
-                     PhotoPath = pictureName
-                 };
-                 await _dbContext.AddAsync(route);
-                 try
-                 {
-                     await _dbContext.SaveChangesAsync();
-                 }
-                 catch (DbUpdateConcurrencyException)
-                 {
-                     return NotFound();
-                 }
-             }*/
+          
             return Conflict();
         }
+
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> Photos(int id)
+        {
+            var photos = await _service.GetPhotos(id);
+            List<string> photosRes = new List<string>();
+            foreach(var p in photos)
+            {
+                byte[] photo = new byte[0];
+
+                try
+                {
+                    photo = await GetPictureFromAmazonS3(p);
+                }
+                catch (Exception e)
+                {
+                
+                }
+
+                if (photo != null)
+                {
+                    var stickerBase64 = Convert.ToBase64String(photo.ToArray());
+                    photosRes.Add(stickerBase64);
+                }
+                
+            }
+          
+            return Ok(new PhotosResponse {Photos = photosRes });
+        }
+
 
         /// <summary>
         /// 
@@ -158,6 +195,21 @@ namespace OneMoreStepAPI.Controllers
         {
             var res = await _service.Like(GetUserId(), routeId);
             if (!res) return BadRequest();
+            return Ok();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="routeDTO"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> ProfilePhoto([FromBody] StringRequest photo)
+        {
+            var pictureName = await SendPictureToAmazonS3(photo.Photo);
+            await _service.AddPhoto(GetUserId(), pictureName);
+
             return Ok();
         }
     }

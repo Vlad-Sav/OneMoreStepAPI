@@ -13,5 +13,10 @@ namespace OneMoreStepAPI.Services.Base
         public Task<int> GetStickersCount();
 
         public Task<(int, bool)> RandomSticker(int userId);
+
+        public Task<bool> PinSticker(int userId, int stickerId);
+
+        public Task<List<int>> GetUsersStickers(int userId);
+
     }
 }

@@ -19,8 +19,40 @@ namespace OneMoreStepAPI.Services
         {
         }
 
-        public async Task<bool> CreateRoute(RouteSaveRequest routeDTO, int userId)
+        public async Task AddPhoto(int routeId, string photoPath)
         {
+            await _dbContext.RoutesPictures.AddAsync(new RoutesPicture { RouteId = routeId, PhotoPath = photoPath});
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                
+            }
+        }
+
+        public async Task AddProfilePhoto(int userId, string photoPath)
+        {
+            await _dbContext.ProfilePhotos.AddAsync(new ProfilePhotos() {
+                UserId = userId,
+                PhotoPath = photoPath
+            });
+
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+
+            }
+        }
+
+
+        public async Task<Route> CreateRoute(RouteSaveRequest routeDTO, int userId)
+        {
+
             var route = new Route
             {
                 Title = routeDTO.RouteTitle,
@@ -34,12 +66,22 @@ namespace OneMoreStepAPI.Services
             try
             {
                 await _dbContext.SaveChangesAsync();
-                return true;
+                var addedRoute = await _dbContext.Routes.FirstOrDefaultAsync(r => r.Title == routeDTO.RouteTitle &&
+                                                                r.Description == routeDTO.RouteDescription &&
+                                                                r.UserId == userId);
+
+                return addedRoute;
             }
             catch (DbUpdateConcurrencyException)
             {
-                return false;
+                return null;
             }
+        }
+
+        public async Task<List<string>> GetPhotos(int routeId)
+        {
+            var photos = await _dbContext.RoutesPictures.Where(r => r.RouteId == routeId).ToListAsync();
+            return photos.Select(p => p.PhotoPath).ToList();
         }
 
         public async Task<List<RouteResponse>> GetRoutes()
@@ -72,6 +114,17 @@ namespace OneMoreStepAPI.Services
             {
                 return false;
             }
+        }
+
+        public async Task<List<RouteResponse>> MyRoutes(int userId)
+        {
+
+            var config = new MapperConfiguration(cfg => {
+                cfg.AddProfile<OMSAutoMapper>();
+            });
+            var mapper = new Mapper(config);
+            var res = await _dbContext.Routes.Include("User").Where(r => r.UserId == userId).Select(r => mapper.Map<RouteResponse>(r)).ToListAsync();
+            return res;
         }
 
         public async Task<bool> Unlike(int userId, int routeId)

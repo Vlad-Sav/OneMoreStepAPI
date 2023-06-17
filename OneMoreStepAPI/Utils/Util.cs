@@ -15,6 +15,8 @@ namespace OneMoreStepAPI
 {
     public static class Util
     {
+        public const int STEPS_FOR_LEVEL = 5000;
+
         public static MemoryStream Base64StringToImage(string base64String)
         {
             byte[] imageBytes = Convert.FromBase64String(base64String);

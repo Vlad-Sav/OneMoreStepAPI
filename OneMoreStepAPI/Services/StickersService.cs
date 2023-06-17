@@ -49,8 +49,34 @@ namespace OneMoreStepAPI.Services
                     new UsersStickers { StikerId = randomStickerId, UserId = userId });
                 await _dbContext.SaveChangesAsync();
             }
-
+            var chests = await _dbContext.Chests.FirstOrDefaultAsync(l => l.UserId == userId);
+            chests.ChestNumber--;
+            _dbContext.Chests.Update(chests);
+            await _dbContext.SaveChangesAsync();
+            
             return (randomStickerId, alreadyHave);
+        }
+
+        public async Task<bool> PinSticker(int userId, int stickerId)
+        {
+            var usersPinnedSticker = await _dbContext.UsersPinnedStickers
+               .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (usersPinnedSticker == null)
+            {
+                await _dbContext.UsersPinnedStickers.AddAsync(new UsersPinnedSticker { StickerId = stickerId, UserId = userId });
+                await _dbContext.SaveChangesAsync();
+                return true;
+            }
+            usersPinnedSticker.StickerId = stickerId;
+            _dbContext.Update(usersPinnedSticker);
+            await _dbContext.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<int>> GetUsersStickers(int userId)
+        {
+             return await _dbContext.UsersStickers.Where(s => s.UserId == userId).Select(s => s.StikerId).ToListAsync();
         }
     }
 }

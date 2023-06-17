@@ -25,5 +25,9 @@ namespace OneMoreStepAPI.Models
         public virtual ICollection<UsersStepsCount> UsersStepsCounts { get; set; }
         public virtual ICollection<UsersStickers> UsersStickers { get; set; }
         public virtual UsersPinnedSticker UserPinnedSticker { get; set; }
+        public virtual ICollection<Level> Levels { get; set; }
+        public virtual ICollection<Progress> Progress { get; set; }
+        public virtual ICollection<Chest> Chests { get; set; }
+        public virtual ProfilePhotos ProfilePhoto { get; set; }
     }
 }

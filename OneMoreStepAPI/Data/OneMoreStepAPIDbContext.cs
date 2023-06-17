@@ -27,5 +27,9 @@ namespace OneMoreStepAPI.Data
         public DbSet<UsersPinnedSticker> UsersPinnedStickers { get; set; }
         public DbSet<RoutesLikes> RoutesLikes { get; set; }
         public DbSet<UsersStickers> UsersStickers { get; set; }
+        public DbSet<Level> Levels { get; set; }
+        public DbSet<Progress> Progress { get; set; }
+        public DbSet<Chest> Chests { get; set; }
+        public DbSet<ProfilePhotos> ProfilePhotos { get; set; }
     }
 }

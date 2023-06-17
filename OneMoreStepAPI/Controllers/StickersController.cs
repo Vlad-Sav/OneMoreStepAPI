@@ -80,6 +80,22 @@ namespace OneMoreStepAPI.Controllers
         }
 
         [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> UsersStickers()
+        {
+            try
+            {
+                var res = await _service.GetUsersStickers(GetUserId());
+                if (res == null) return BadRequest();
+                return Ok(new IntListResponse() { StickerIds = res });
+            }
+            catch
+            {
+            }
+            return BadRequest();
+        }
+
+        [HttpGet]
         [Route("[action]/{id}")]
         public async Task<IActionResult> Sticker(int id)
         {
@@ -127,5 +143,58 @@ namespace OneMoreStepAPI.Controllers
             var stickerBase64 = Convert.ToBase64String(sticker.ToArray());
             return Ok(new RandomStickerResponse { Sticker = stickerBase64, AlreadyHave = res.Item2 });
         }
+
+        [HttpPut]
+        [Route("[action]")]
+        public async Task<IActionResult> PinSticker([FromBody] StickerRequest stickerRequest)
+        {
+            var userId = GetUserId();
+            await _service.PinSticker(userId, stickerRequest.Id);
+            return Ok();
+        }
+        /* [HttpGet]
+         [Route("[action]")]
+         public async Task<IActionResult> RandomSticker()
+         {
+             var userId = GetUserId();
+             var res = await _service.RandomSticker(userId);
+
+             byte[] sticker;
+
+
+             var stickerBase64 = Convert.ToBase64String(sticker.ToArray());
+             return Ok(new RandomStickerResponse { Sticker = stickerBase64, AlreadyHave = res.Item2 });
+         }*/
+
+        [HttpGet]
+        [Route("[action]/{id}")]
+        public async Task<IActionResult> UsersPinnedSticker(int id)
+        {
+            var usersPinnedSticker = await _service.GetUserPinnedStickerAsync(id);
+
+            if (usersPinnedSticker == null)
+            {
+                return NotFound();
+            }
+
+            byte[] sticker;
+
+            try
+            {
+                sticker = await GetPictureFromAmazonS3("Stickers/" + usersPinnedSticker.Sticker.Url);
+            }
+            catch (Exception e)
+            {
+                return NotFound();
+            }
+
+            if (sticker == null)
+            {
+                return NotFound();
+            }
+            var stickerBase64 = Convert.ToBase64String(sticker.ToArray());
+            return Ok(new UsersPinnedStickerResponse { Sticker = stickerBase64 });
+        }
+
     }
 }

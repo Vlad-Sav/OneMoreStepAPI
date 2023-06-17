@@ -36,6 +36,38 @@ namespace OneMoreStepAPI.Services
             return res;
         }
 
+        public async Task<List<Top3UserResponse>> GetTopUserForMonth()
+        {
+            DateTime currentDate = DateTime.Now;
+            DateTime oneMonthAgo = currentDate.AddMonths(-1);
+
+            // Топ 3 пользователей за неделю
+            return await _dbContext.UsersStepsCount
+                .Include("User")
+                .Where(u => u.Date >= oneMonthAgo && u.Date <= currentDate)
+                .GroupBy(u => new { u.UserId, u.User.Username })
+                .OrderByDescending(g => g.Sum(u => u.StepsCount))
+                .Take(3)
+                .Select(g => new Top3UserResponse { UserId = g.Key.UserId, UserName = g.Key.Username, StepsCount = g.Sum(u => u.StepsCount) })
+                .ToListAsync();
+        }
+
+        public async Task<List<Top3UserResponse>> GetTopUserForWeek()
+        {
+            DateTime currentDate = DateTime.Now;
+            DateTime oneWeekAgo = currentDate.AddDays(-7);
+
+            // Топ 3 пользователей за неделю
+            return await _dbContext.UsersStepsCount
+                .Include("User")
+                .Where(u => u.Date >= oneWeekAgo && u.Date <= currentDate)
+                .GroupBy(u => new { u.UserId, u.User.Username })
+                .OrderByDescending(g => g.Sum(u => u.StepsCount))
+                .Take(3)
+                .Select(g => new Top3UserResponse { UserId = g.Key.UserId, UserName = g.Key.Username, StepsCount = g.Sum(u => u.StepsCount) })
+                .ToListAsync();
+        }
+
         public async Task<User> GetUser(int userId)
         {
             return await _dbContext.Users.FindAsync(userId);
